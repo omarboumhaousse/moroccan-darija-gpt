@@ -1,0 +1,22 @@
+# Credentials. huggingface_hub writes a token into .cache/ relative to the
+# working directory, so this is not optional.
+.cache/
+.env
+*.env
+
+# Tokenized corpus. Lives on S3, not in git.
+data/*.bin
+
+# Provenance from whichever prepare.py run happened last. Commit it only
+# alongside the real full-corpus run, otherwise it records a smoke test.
+data/meta.json
+
+# Checkpoints
+*.pt
+checkpoints/
+
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+.ipynb_checkpoints/
