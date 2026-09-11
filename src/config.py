@@ -94,6 +94,20 @@ class ModelConfig:
         }
 
 
+@dataclass(frozen=True)
+class TrainConfig:
+    """The training loop's settings."""
+
+    batch_size: int = 64          # sequences per step: 64 x 256 = 16,384 tokens
+    learning_rate: float = 1e-3   # peak, reached after warmup (nanoGPT's baby-GPT value)
+    min_lr: float = 1e-4          # floor of the cosine decay, a tenth of the peak
+    warmup_iters: int = 100       # linear warmup from almost 0 up to the peak
+    max_iters: int = 5000         # the decay ends here; revisited for the full run
+    grad_clip: float = 1.0        # cap on the total gradient norm (nanoGPT's value)
+    eval_interval: int = 500      # steps between loss estimates
+    eval_iters: int = 200         # batches averaged per estimate
+
+
 if __name__ == "__main__":
     cfg = ModelConfig()
     parts = cfg.estimated_params()

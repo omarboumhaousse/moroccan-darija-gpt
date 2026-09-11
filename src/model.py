@@ -130,5 +130,6 @@ class GPT(nn.Module):
         loss = None
         if targets is not None:
             B, T, C = logits.shape
-            loss = F.cross_entropy(logits.view(B * T, C), targets.view(B * T))
+            # targets can be a slice of a bigger tensor, which .view can't flatten
+            loss = F.cross_entropy(logits.view(B * T, C), targets.reshape(B * T))
         return logits, loss
