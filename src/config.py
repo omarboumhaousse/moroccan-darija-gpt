@@ -104,6 +104,9 @@ class TrainConfig:
     warmup_iters: int = 100       # linear warmup from almost 0 up to the peak
     max_iters: int = 5000         # the decay ends here; revisited for the full run
     grad_clip: float = 1.0        # cap on the total gradient norm (nanoGPT's value)
+    amp: bool = True              # mixed precision (fp16) on the GPU; ignored on the CPU
+    checkpoint_path: str = ""     # "" saves nothing; a path or an s3:// URL saves there
+    checkpoint_every: int = 500   # completed steps between checkpoints
     eval_interval: int = 500      # steps between loss estimates
     eval_iters: int = 200         # batches averaged per estimate
 
