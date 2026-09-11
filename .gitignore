@@ -17,6 +17,10 @@ checkpoints/
 
 __pycache__/
 *.py[cod]
+.pytest_cache/
 .venv/
 venv/
 .ipynb_checkpoints/
+
+# Personal study notes, kept out of the public repo.
+NOTES.md

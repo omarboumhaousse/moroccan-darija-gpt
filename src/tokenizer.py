@@ -72,7 +72,7 @@ def iter_rows(cfg: DataConfig, columns: list[str] | None = None,
     any prefix of this iterator is balanced across all five. Reading them
     sequentially instead means a `limit` never reaches shards 1 to 4, and the
     shards are not interchangeable: shard 0 averages 842 bytes per row against
-    1878 for the corpus.
+    about 2,000 for the corpus.
 
     `offset` lets a second pass pick row groups the first pass never touched,
     which is how we measure compression on text the tokenizer has not seen.
