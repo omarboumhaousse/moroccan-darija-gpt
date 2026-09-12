@@ -1,8 +1,8 @@
-# Darija GPT
+# Moroccan Darija (Arabic) GPT
 
-**A 13.8M-parameter transformer that writes Moroccan Darija, built from an empty file in PyTorch.**
+**A 13.8M-parameter transformer that writes Moroccan Darija, built from scratch in PyTorch.**
 
-No pretrained weights, no fine-tuning, no `transformers` import. Attention, the blocks, the training loop, the sampler: all of it written line by line. 282 million tokens of Darija, 78 minutes on one GPU — about 45 cents if you had to rent it.
+No pretrained weights, no fine-tuning, no `transformers` import. Attention, the blocks, the training loop, the sampler: all of it written line by line. 282 million tokens of Darija, 78 minutes on one GPU, about 45 cents if you had to rent it.
 
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="docs/samples-dark.svg">
@@ -20,10 +20,10 @@ Real output from `src/sample.py`, run against the finished checkpoint. The only 
 | Training data | 281.9M tokens from 927,950 Moroccan Darija documents |
 | Hardware | one Tesla T4, 16 GB |
 | Training time | **78 minutes**, 17,000 steps, one pass over the corpus |
-| Final loss | train 3.80, **validation 3.93** — perplexity 51 |
+| Final loss | train 3.80, **validation 3.93**, perplexity 51 |
 | Tests | 5, including one that fails if attention ever leaks the future |
 
-For scale: a model that knows nothing scores 8.99 (perplexity 8,000). A model that knows only how often each token appears scores 7.71 (perplexity 2,227). This one scores 3.93, which is 44× better than the second — out of 8,000 possible tokens it has narrowed the next one down to about 51.
+For scale: a model that knows nothing scores 8.99 (perplexity 8,000). A model that knows only how often each token appears scores 7.71 (perplexity 2,227). This one scores 3.93, which is 44× better than the second, out of 8,000 possible tokens it has narrowed the next one down to about 51.
 
 ## What it is, and what it is not
 
@@ -36,9 +36,9 @@ For scale: a model that knows nothing scores 8.99 (perplexity 8,000). A model th
 <p>أكيد، نقدر نعاونك تصاوب وظيفة ديال الكود ديال JavaScript... حدد الكونفيگوراسيون ديال JavaScript: هاد الكونفيگوراسيون ديال JavaScript غادي تكون فيها سيرفر ديال JavaScript</p>
 </blockquote>
 
-*"Can you give me the JavaScript code so I can build a JavaScript code function? — Sure, I can help you build a JavaScript code function. Define the JavaScript configuration: this JavaScript configuration will contain a JavaScript server..."*
+*"Can you give me the JavaScript code so I can build a JavaScript code function?, Sure, I can help you build a JavaScript code function. Define the JavaScript configuration: this JavaScript configuration will contain a JavaScript server..."*
 
-Correct register, correct grammar, correct shape of a helpful answer, zero content. At 13.8M parameters, with every token seen exactly once, that is the honest ceiling — and knowing where the ceiling is was part of the point.
+Correct register, correct grammar, correct shape of a helpful answer, zero content. At 13.8M parameters, with every token seen exactly once, that is the honest ceiling, and knowing where the ceiling is was part of the point.
 
 ## The data
 
@@ -53,7 +53,7 @@ One source, one script, one tokenizer: [`atlasia/Atlaset`](https://huggingface.c
 
 Measuring the corpus turned out to be the first real lesson. Streaming the first few thousand rows and extrapolating gave an answer that was wrong by 9×, because a stream of a sharded dataset is a prefix, not a sample, and the first shard is full of unusually short documents. The fix was to read the Parquet footers and one light column instead: exact counts, no download.
 
-The tokenizer is a byte-level BPE, so there is no unknown token — every byte has an id, and Arabic script costs two bytes per character before the merges start.
+The tokenizer is a byte-level BPE, so there is no unknown token, every byte has an id, and Arabic script costs two bytes per character before the merges start.
 
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="docs/tokens-dark.svg">
@@ -64,7 +64,7 @@ The result: 3.12 characters per token, 1.85 tokens per word.
 
 ## How it works
 
-The architecture follows Karpathy's nanoGPT deliberately — it is the clearest small implementation there is, and the point of this project was to understand every line, not to invent a new one.
+The architecture is clear and small and the point of this project was to understand every line, not to invent a new one.
 
 A token id becomes a vector, a position vector is added to it, and the result flows through six identical blocks into a final projection back to 8,000 logits.
 
@@ -73,7 +73,7 @@ A token id becomes a vector, a position vector is added to it, and the result fl
   <img alt="The whole model: embeddings, six blocks, final LayerNorm, tied output head" src="docs/model-light.svg">
 </picture>
 
-The output head and the token embedding are **the same matrix**, used in both directions. That is weight tying, and it saves 3,072,000 parameters — 22% of the model — on the theory that if two tokens are similar going in, they should be similar coming out.
+The output head and the token embedding are **the same matrix**, used in both directions. That is weight tying, and it saves 3,072,000 parameters, 22% of the model, on the theory that if two tokens are similar going in, they should be similar coming out.
 
 ### Attention, in one picture
 
@@ -84,7 +84,7 @@ Every token looks at every token before it, and at itself, and at nothing after.
   <img alt="Attention weights of one head on a Darija sentence, drawn right to left" src="docs/attention-light.svg">
 </picture>
 
-The triangle is the causal mask: scores for future positions are set to −∞ before the softmax, so they come out as exactly zero probability. This is enforced by a test, not by hope — `tests/test_model.py` changes a token and asserts that every output before it moves by exactly 0.0.
+The triangle is the causal mask: scores for future positions are set to −∞ before the softmax, so they come out as exactly zero probability. This is enforced by a test, `tests/test_model.py` changes a token and asserts that every output before it moves by exactly 0.0.
 
 ### One block
 
@@ -104,14 +104,14 @@ Where the parameters actually live:
 
 ## Training it
 
-AdamW, batch 64, 256-token context — 16,384 tokens per step. The learning rate warms up for 100 steps and then follows a cosine down to a tenth of its peak:
+AdamW, batch 64, 256-token context, 16,384 tokens per step. The learning rate warms up for 100 steps and then follows a cosine down to a tenth of its peak:
 
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="docs/lr-dark.svg">
   <img alt="Learning rate schedule: linear warmup then cosine decay" src="docs/lr-light.svg">
 </picture>
 
-The schedule is a pure function of the step number, which means a run that dies and resumes lands on exactly the right learning rate — no extra state to save, nothing to get wrong.
+The schedule is a pure function of the step number, which means a run that dies and resumes lands on exactly the right learning rate, no extra state to save, nothing to get wrong.
 
 The GPU is a T4, which has fp16 tensor cores and no bf16, so training runs in mixed precision with a gradient scaler: the loss is scaled up before the backward pass so small gradients do not vanish into fp16's floor, then unscaled before clipping so the clip sees real numbers.
 
@@ -131,11 +131,11 @@ And then it trains:
   <img alt="Training and validation loss over 17,000 steps" src="docs/train-light.svg">
 </picture>
 
-Train and validation end 0.13 apart, and the best validation loss in the whole run is the last one. With 20 tokens per parameter and every token seen once, there was nothing to memorise — which is also why dropout is set to 0.
+Train and validation end 0.13 apart, and the best validation loss in the whole run is the last one. With 20 tokens per parameter and every token seen once, there was nothing to memorise, which is also why dropout is set to 0.
 
 ## How I know it works
 
-Three checks before training, because a transformer that is subtly wrong still produces plausible-looking loss curves:
+Three checks before training:
 
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="docs/checks-dark.svg">
@@ -144,7 +144,7 @@ Three checks before training, because a transformer that is subtly wrong still p
 
 The third one is the useful one. An untrained model should put 1/8,000 on every token, giving a loss of ln(8,000) = 8.99. Measured: 9.07. If it had come out at 300, the initialisation was broken; if it had come out at 3, information was leaking from the targets.
 
-Then the check that the optimisation actually optimises — train the real model on one single batch, over and over, and watch it memorise:
+Then the check that the optimisation actually optimises, train the real model on one single batch, over and over, and watch it memorise:
 
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="docs/overfit-dark.svg">
@@ -167,7 +167,7 @@ python -m src.train              # 17,000 steps                 (~78 min on a T4
 python -m src.sample --checkpoint ckpt.pt --prompt "المغرب"
 ```
 
-`checkpoint_path` in `src/config.py` is empty by default, so training saves nothing until you set it — a local path or an `s3://` URL, same code either way. That default is deliberate: no test and no half-finished experiment can overwrite a real checkpoint by accident.
+`checkpoint_path` in `src/config.py` is empty by default, so training saves nothing until you set it, a local path or an `s3://` URL, same code either way. That default is deliberate: no test and no half-finished experiment can overwrite a real checkpoint by accident.
 
 `python -m pytest -q` runs the five tests. Every number in the project lives in `src/config.py` and nowhere else.
 
@@ -175,7 +175,7 @@ python -m src.sample --checkpoint ckpt.pt --prompt "المغرب"
 
 - **A bigger model before more steps.** At 20 tokens per parameter this is already near the compute-optimal point; another pass over the same data buys far less than another few million parameters would.
 - **A longer context.** 256 tokens is one or two paragraphs, which is why the model loses the thread. Attention costs O(T²), so this is the expensive one.
-- **Ablations to justify the architecture instead of inheriting it**: weight tying on and off, rotary positions against learned ones, context length — each one a short run against a measured noise floor, so the differences mean something.
+- **Ablations to justify the architecture**: weight tying on and off, rotary positions against learned ones, context length, each one a short run against a measured noise floor, so the differences mean something.
 
 ## The repo
 
@@ -189,5 +189,3 @@ src/sample.py      load a checkpoint and write Darija
 tests/             five tests: shapes, causality, untrained loss, overfitting, schedule
 docs/figures.py    every figure above, generated from the code itself
 ```
-
-Built by [Omar Boumhaousse](https://github.com/omarboumhaousse). The figures are hand-written SVG generated from the real code and the real runs — nothing in this README is illustrative.
