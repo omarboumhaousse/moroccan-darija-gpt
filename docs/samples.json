@@ -1,0 +1,37 @@
+{
+  "checkpoint": "s3://omarboumhaousse/darija-gpt/ckpt.pt",
+  "step": 16999,
+  "top_k": 50,
+  "seed": 1337,
+  "device": "Tesla T4",
+  "note": "Excerpts from src/sample.py run on the pod. Transcribed from its output.",
+  "panels": [
+    {
+      "temperature": 0.5,
+      "prompt": "",
+      "verdict": "too safe: it locks into a loop",
+      "lines": [
+        "علمت “كود” ان اللجنة المشتركة للمجلس الوطني لحقوق الانسان",
+        "ان اللجنة المشتركة للمجلس الوطني لحقوق الانسان ان اللجنة…"
+      ]
+    },
+    {
+      "temperature": 0.8,
+      "prompt": "",
+      "verdict": "the default: varied, and still coherent",
+      "lines": [
+        "علمت “كود” ان اللجنة التربوية المكلفة بانتخاب رئيس المجلس",
+        "الأعلى للحسابات، قد تفاعلت خلالها مع “الصباح” مع “كود”…"
+      ]
+    },
+    {
+      "temperature": 1.0,
+      "prompt": "المغرب",
+      "verdict": "free: more varied, less on topic",
+      "lines": [
+        "المغرب غادي يسالي نهار الجمعة. دابا هادو كاملين ممنحنو",
+        "باش يوصلو هاد الميدالية الصينية للفرنسيين وغادي يتواجهو…"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,23 @@
+{
+  "measured": "2026-09-12, SSP Cloud vscode-pytorch-gpu pod",
+  "device": "Tesla T4",
+  "torch": "2.13.0+cu130",
+  "batch_size": 64,
+  "block_size": 256,
+  "steps": 40,
+  "corpus_tokens": 284300000,
+  "runs": {
+    "fp32": {
+      "ms_per_step": 527,
+      "peak_gb": 4.76,
+      "train_loss_step39": 7.618,
+      "val_loss_step39": 7.6446
+    },
+    "fp16": {
+      "ms_per_step": 265,
+      "peak_gb": 5.1,
+      "train_loss_step39": 7.618,
+      "val_loss_step39": 7.6446
+    }
+  }
+}

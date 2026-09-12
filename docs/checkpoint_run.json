@@ -1,0 +1,9 @@
+{
+  "measured": "2026-09-12, laptop, the real 13.8M model after one optimizer step",
+  "total_mb": 165.9,
+  "model_mb": 55.2,
+  "optimizer_mb": 110.5,
+  "other_mb": 0.2,
+  "state_dict_listed_mb": 67.5,
+  "checkpoint_every": 500
+}
