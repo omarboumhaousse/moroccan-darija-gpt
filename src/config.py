@@ -102,13 +102,13 @@ class TrainConfig:
     learning_rate: float = 1e-3   # peak, reached after warmup (nanoGPT's baby-GPT value)
     min_lr: float = 1e-4          # floor of the cosine decay, a tenth of the peak
     warmup_iters: int = 100       # linear warmup from almost 0 up to the peak
-    max_iters: int = 5000         # the decay ends here; revisited for the full run
+    max_iters: int = 17000        # one pass over the real corpus (281.9M tokens)
     grad_clip: float = 1.0        # cap on the total gradient norm (nanoGPT's value)
     amp: bool = True              # mixed precision (fp16) on the GPU; ignored on the CPU
     checkpoint_path: str = ""     # "" saves nothing; a path or an s3:// URL saves there
-    checkpoint_every: int = 500   # completed steps between checkpoints
+    checkpoint_every: int = 1000  # completed steps between checkpoints
     eval_interval: int = 500      # steps between loss estimates
-    eval_iters: int = 200         # batches averaged per estimate
+    eval_iters: int = 50          # batches averaged per estimate
 
 
 if __name__ == "__main__":
