@@ -133,3 +133,19 @@ class GPT(nn.Module):
             # targets can be a slice of a bigger tensor, which .view can't flatten
             loss = F.cross_entropy(logits.view(B * T, C), targets.reshape(B * T))
         return logits, loss
+
+    @torch.no_grad()
+    def generate(self, idx, max_new_tokens, temperature=1.0, top_k=None):
+        """Continue idx (B, T) one token at a time. Call model.eval() first."""
+        for _ in range(max_new_tokens):
+            # the model only has positions 0..block_size-1, so keep the tail
+            idx_cond = idx[:, -self.config.block_size:]
+            logits, _ = self(idx_cond)          # (B, T, vocab_size)
+            logits = logits[:, -1, :] / temperature  # (B, vocab_size): only the last position
+            if top_k is not None:
+                v, _ = torch.topk(logits, min(top_k, logits.size(-1)))
+                logits[logits < v[:, [-1]]] = -float("inf")  # everything else cannot be drawn
+            probs = F.softmax(logits, dim=-1)   # (B, vocab_size)
+            idx_next = torch.multinomial(probs, num_samples=1)  # (B, 1)
+            idx = torch.cat((idx, idx_next), dim=1)  # (B, T+1)
+        return idx
